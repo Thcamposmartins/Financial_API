@@ -7,6 +7,7 @@ export class CreateUserConstroller{
 
     async createUser( req: Request, res: Response, customers:ICreateUserRequestDTO []): Promise<Response>{
         const {name, cpf} = req.body   
+
         try{
             const costumerAlreadyExists = customers.some(
                 (custumer)=>custumer.cpf===cpf
@@ -14,12 +15,11 @@ export class CreateUserConstroller{
 
             if(costumerAlreadyExists)
                 return res.status(400).json({error: "Customer already exists! 🤦‍♂️"})
-
             customers.push({                                    
                 cpf,
                 name,
                 id:uuid(),
-                statement: []
+                statement:[]
             })
 
             return res.status(201).json(customers)   
@@ -34,5 +34,28 @@ export class CreateUserConstroller{
         const customer = await JSON.parse(VerifyIfExistsAccounrCPF(String(cpf),customers))
 
         return response.status(201).json({"Is statement exists 🙌":customer.statement})
+    }
+
+    async getStatementforDate(request: Request, response: Response, customers:ICreateUserRequestDTO []): Promise<Response>{
+        const {cpf} = request.headers
+        const {date} = request.query
+        const customer = await JSON.parse(VerifyIfExistsAccounrCPF(String(cpf),customers))
+        
+        const dateFormat = new Date(date + " 00:00")
+        const statement = customer.statement.filter(
+            (statement)=>
+            statement.created_at.toDateString()===
+            new Date(dateFormat).toDateString()
+        )
+
+        return response.json(statement)
+    }
+
+    async deleteAccount(request: Request, response: Response, customers:ICreateUserRequestDTO []): Promise<Response>{
+        const {cpf} = request.headers        
+        const customer = await JSON.parse(VerifyIfExistsAccounrCPF(String(cpf),customers))
+        
+        customers.splice(customer,1)
+        return response.status(200).json(customers)
     }
 }
