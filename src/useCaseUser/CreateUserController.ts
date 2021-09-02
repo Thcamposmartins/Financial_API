@@ -5,8 +5,8 @@ import { VerifyIfExistsAccounrCPF } from "./verifyIfExistsAccountCPF"
 
 export class CreateUserConstroller{
 
-    async createUser( req: Request, res: Response, customers:ICreateUserRequestDTO []): Promise<Response>{
-        const {name, cpf} = req.body   
+    async createUser(request: Request, response: Response, customers:ICreateUserRequestDTO []): Promise<Response>{
+        const {name, cpf} = request.body   
 
         try{
             const costumerAlreadyExists = customers.some(
@@ -14,7 +14,7 @@ export class CreateUserConstroller{
             ) 
 
             if(costumerAlreadyExists)
-                return res.status(400).json({error: "Customer already exists! 🤦‍♂️"})
+                return response.status(400).json({error: "Customer already exists! 🤦‍♂️"})
             customers.push({                                    
                 cpf,
                 name,
@@ -22,10 +22,10 @@ export class CreateUserConstroller{
                 statement:[]
             })
 
-            return res.status(201).json(customers)   
+            return response.status(201).json(customers)   
 
         }catch(err){
-            return res.status(400).json({error: "Is not possible save the User 🤷‍♀️"})
+            return response.status(400).json({error: "Is not possible save the User 🤷‍♀️"})
         }
     }
 
